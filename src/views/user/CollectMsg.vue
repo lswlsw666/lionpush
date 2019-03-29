@@ -15,6 +15,11 @@
     export default {
         components: {
             Msg
+        },
+        methods:{
+            callback(key){
+                console.log(key);
+            },
         }
     }
 </script>

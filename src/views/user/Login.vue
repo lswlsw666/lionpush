@@ -124,7 +124,6 @@
                                 }
                             }
                         );
-                        // console.log('Received values of form: ', values);
                         app.$router.push('/');
                     }
                 })

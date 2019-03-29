@@ -1,6 +1,5 @@
 <template>
     <div style="padding: 10px;background: #F0F0F0;height: 100%;">
-        <!--<h2 style="color: #2524ff">我发布的消息</h2>-->
         <a-row :gutter="16">
             <a-col :span="12">
                 <a-card title="信息收录率" :bordered=false>
@@ -53,7 +52,7 @@
         <div style="background: #fff;margin-top: 10px;">
             <a-tabs defaultActiveKey="1" @change="callback" @tabClick="tabClick">
                 <a-tab-pane style="padding: 28px" v-for="msgtitle in msgtabs" :tab="msgtitle.title" :key="msgtitle.key">
-                    <Msg></Msg>
+                    <Msg :content="messages"></Msg>
                 </a-tab-pane>
             </a-tabs>
         </div>
@@ -62,9 +61,15 @@
 <script>
     import ARow from "ant-design-vue/es/grid/Row";
     import Msg  from '@/views/user/Msg.vue';
+    import { allNews } from "@/api/msg";
     export default {
         components: {
             ARow,Msg
+        },
+        mounted () {
+            this.getNewsData((res) => {
+                this.messages = res.data;
+            });
         },
         data () {
             const msgtabs = [
@@ -74,13 +79,33 @@
             ];
             return {
                 msgtabs,
+                messages:[],
             }
 
         },
         methods:{
+            getNewsData (callback){
+                const token = localStorage.getItem('token');
+                const app = this;
+                allNews(token).then(res=>{
+                    if (res.status == 200){
+                        if (res.data.code == 40000){
+                            callback(res.data);
+                        } else {
+                            app.$Message.error(res.data.msg);
+                            localStorage.setItem('token','');
+                            this.$router.push('/Login');
+                        }
+                    }
+                });
+
+            },
             tabClick(key){
-                console.log(key);
-            }
+                // console.log(key);
+            },
+            callback(key){
+                // console.log(key);
+            },
         }
     }
 </script>

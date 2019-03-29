@@ -3,7 +3,7 @@
             itemLayout="vertical"
             size="large"
             :pagination="pagination"
-            :dataSource="listData"
+            :dataSource="content"
     >
         <div slot="footer"><b>ant design vue</b> footer part</div>
         <a-list-item slot="renderItem" slot-scope="item, index" key="item.title">
@@ -17,10 +17,10 @@
             <a-list-item-meta
                     :description="item.description"
             >
-                <a slot="title" :href="item.href">{{item.title}}</a>
-                <a-avatar slot="avatar" :src="item.avatar" />
+                <a slot="title" :href="item.href"><b>{{item.m_title}}</b></a>
+                <a-avatar slot="avatar" :src="avatar" />
             </a-list-item-meta>
-            {{item.content}}
+            {{item.m_tel}}/{{item.m_invest_money}}/{{item.m_company}}
         </a-list-item>
     </a-list>
 </template>
@@ -37,12 +37,13 @@
     }
 
     export default {
+        props:['content'],
         data () {
             return {
                 listData,
                 pagination: {
                     onChange: (page) => {
-                        console.log(page);
+                        // console.log(page);
                     },
                     pageSize: 3,
                 },
@@ -56,6 +57,7 @@
                     { type: 'like-o', text: '156' },
                     { type: 'message', text: '2' },
                 ],
+                avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
             }
         },
     }

@@ -33,10 +33,12 @@
                         <a-input
                                 v-decorator="[
                                   'title',
-                                  {rules: [{ required: true, message: '请输入您的标题!' }]}
+                                  {rules: [{ required: true, message: '请输入您的标题!' },
+                                    {validator: checkTitle},
+                                  ]}
                                 ]"
-                                placeholder='请输入您的标题'
-                                maxlength="28"
+                                placeholder='请输入您的标题(不得超过26个字符，且不能填写任何联系方式)'
+                                maxlength="26"
                         />
                     </a-form-item>
                     <a-form-item
@@ -53,7 +55,7 @@
                         >
                             <a-select-option v-for="service in servicedata.serviceinfo"
                                  :key="service.id"
-                                 :value='service.id'
+                                 :value='service.name'
                                  @click="selectService(service.id)"
                             >
                                 {{service.name}}
@@ -103,7 +105,7 @@
                             label='投资金额'
                     >
                         <!--v-decorator="['radio-group']"-->
-                        <a-radio-group v-decorator="['invest-money']">
+                        <a-radio-group v-decorator="['invest_money',{required: true, message: '请选择投资金额!'}]">
                             <a-radio value='a'>1万以下</a-radio>
                             <a-radio value='b'>1~5万</a-radio>
                             <a-radio value='c'>5~10万</a-radio>
@@ -121,7 +123,8 @@
                                   'brand_name',
                                   {rules: [{ required: true, message: '请输入品牌名称!' }]}
                                 ]"
-                                placeholder='请输入品牌名称'
+                                placeholder='请输入品牌名称!'
+                                maxlength="26"
                         />
                     </a-form-item>
                     <a-divider type="horizontal" style="margin: 8px 0 16px 0" />
@@ -135,6 +138,7 @@
                                   {rules: [{ required: true, message: '请输入您的公司名称!' }]}
                                 ]"
                                 placeholder='请输入您的公司名称'
+                                maxlength="26"
                         />
                     </a-form-item>
                     <a-form-item
@@ -155,7 +159,7 @@
                     >
                         <div class='dropbox' style="height: 100%">
                             <a-upload-dragger
-                                    v-decorator="['dragger', {
+                                    v-decorator="['pics', {
                                       valuePropName: 'fileList',
                                       getValueFromEvent: normFile,
                                     }]"
@@ -177,6 +181,19 @@
                             </a-upload-dragger>
                         </div>
                     </a-form-item>
+
+                    <a-form-item
+                            v-bind="formItemLayout"
+                            label='地区'
+                            hasFeedback
+                    >
+                        <a-cascader v-decorator="[
+                                    'service',
+                                    {rules: [{ required: true, message: '请选择地区!' }]}]"
+                                    placeholder='请选择地区'
+                                    :options="options" @change="onSelect" changeOnSelect />
+                    </a-form-item>
+
                     <a-form-item
                             v-bind="formItemLayout"
                             label='微信号'
@@ -187,6 +204,7 @@
                                   {rules: [{ required: true, message: '请输入您的微信号!' }]}
                                 ]"
                                 placeholder='请输入您的微信号'
+                                maxlength="20"
                         />
                     </a-form-item>
                     <a-form-item
@@ -199,6 +217,8 @@
                                   {rules: [{ required: true, message: '请输入联系人名称!' }]}
                                 ]"
                                 placeholder='请输入联系人名称'
+                                maxlength="10"
+                                minlength="2"
                         />
                     </a-form-item>
                     <a-form-item
@@ -208,9 +228,12 @@
                         <a-input
                                 v-decorator="[
                                   'tel',
-                                  {rules: [{ required: true, message: '请输入您的联系电话!' }]}
+                                  {rules: [{ required: true, message: '请输入您的联系电话!' },
+                                    {validator: checkTel},
+                                  ]}
                                 ]"
                                 placeholder='请输入您的联系电话'
+                                maxlength="13"
                         />
                     </a-form-item>
                     <a-form-item
@@ -218,6 +241,8 @@
                     >
                         <a-button type='primary' htmlType='submit'>立即发布</a-button>
                     </a-form-item>
+                    <a-spin tip="发布中..." size="large" :style="objectStyle">
+                    </a-spin>
                 </a-form>
             </a-card>
         </a-layout-content>
@@ -225,6 +250,7 @@
 </template>
 <script>
     import { getAreas,getService } from '@/api/area';
+    import { pushNews } from "@/api/msg";
     const plainOptions = [];
     export default {
         beforeCreate () {
@@ -261,6 +287,33 @@
               selectedcity:localStorage.getItem('city')?localStorage.getItem('city'):'全国',
               citydatas:JSON.parse(localStorage.getItem('citydatas'))|| [],
               servicedata:[],
+              objectStyle: {
+                  display:'none'
+              },
+              options: JSON.parse(localStorage.getItem('citydatas'))|| [],
+              // options: [{
+              //     value: 'zhejiang',
+              //     label: 'Zhejiang',
+              //     children: [{
+              //         value: 'hangzhou',
+              //         label: 'Hangzhou',
+              //         children: [{
+              //             value: 'xihu',
+              //             label: 'West Lake',
+              //         }],
+              //     }],
+              // }, {
+              //     value: 'jiangsu',
+              //     label: 'Jiangsu',
+              //     children: [{
+              //         value: 'nanjing',
+              //         label: 'Nanjing',
+              //         children: [{
+              //             value: 'zhonghuamen',
+              //             label: 'Zhong Hua Men',
+              //         }],
+              //     }],
+              // }]
           }
         },
         methods: {
@@ -277,10 +330,49 @@
             },
             handleSubmit(e) {
                 e.preventDefault();
+                const app = this;
+                app.objectStyle.display = 'block';
                 this.form.validateFields((err, values) => {
-                    console.log(values);
-                    if (!err) {
-                        console.log('Received values of form: ', values);
+                    values.kind = app.checkedList.join(',');
+                    values.area = app.areaCheckedList.join(',');
+                    if (values.pics) {
+                        var pics = values.pics;
+                        var picList = [];
+                        for (var i = 0;i < pics.length;i++){
+                            if (pics[i].status == 'done') {
+                                picList.push(pics[i].response.path);
+                            }
+                        }
+                        if (picList.length > 0){
+                            values.pics = picList.join(',');
+                        }
+                    }
+                    if (values.area.length <= 0) {
+                        app.$Message.error('请选择服务范围!');
+                    }
+                    if (!values.invest_money) {
+                        app.$Message.error('请选择投资金额!');
+                    }
+                    if (localStorage.getItem('token')){
+                        values.u_token = localStorage.getItem('token');
+                    } else {
+                        app.$Message.error('登录状态已失效，请重新登录!');
+                        localStorage.setItem('token','');
+                        this.$router.push('/Login');
+                    }
+                    if (!err && values.area.length > 0 && values.invest_money) {
+                        pushNews(values).then(res=>{
+                            if (res.status == 200) {
+                                if (res.data.code == 40000) {
+                                    app.$Message.success(res.data.msg);
+                                    app.objectStyle.display = 'none';
+                                    app.$router.push('/');
+                                }else {
+                                    app.$Message.error(res.data.msg);
+                                    app.objectStyle.display = 'none';
+                                }
+                            }
+                        });
                     }
                 });
             },
@@ -290,7 +382,6 @@
                 });
             },
             normFile  (e) {
-                console.log(e)
                 if (Array.isArray(e)) {
                     return e;
                 }
@@ -305,9 +396,6 @@
             },
             handleUpload(info) {
                 const status = info.file.status;
-                if (status !== 'uploading') {
-                    console.log(info.file, info.fileList);
-                }
                 if (status === 'done') {
                     this.$Message.success(`${info.file.name} 上传成功`);
                 } else if (status === 'error') {
@@ -317,6 +405,9 @@
             onChange (checkedList) {
                 this.indeterminate = !!checkedList.length && (checkedList.length < this.plainOptions.length);
                 this.checkAll = checkedList.length === this.plainOptions.length;
+            },
+            onSelect (value) {
+                console.log(value);
             },
             onCheckAllChange (e) {
                 Object.assign(this, {
@@ -353,12 +444,13 @@
                         areaList.push(this.citydatas[i].name);
                     }
                     this.areaOptions = areaList;
+                    console.log(this.citydatas);
                     localStorage.setItem('citydatas',JSON.stringify(this.citydatas));
                     localStorage.setItem('areaList',areaList);
                 }
                 localStorage.setItem('city',this.selectedcity);
             },
-            selectService(e){
+            selectService(e) {
                 this.plainOptions = this.servicedata.serviceinfo[e-1].info;
                 this.indeterminate = false;
                 this.checkAll = false;
@@ -368,7 +460,25 @@
                 }else{
                     this.servicevisible = false;
                 }
-            }
+            },
+            checkTitle (rule,value,callback) {
+                if (value){
+                    const regex = /^0\\d{2,3}-?\\d{7,8}$|\d{11}|\d{11}\w|\d{9}$/;//验证是否为联系方式
+                    if (regex.test(value)) {
+                        callback('请勿填写任何联系方式!');
+                    }
+                }
+                callback();
+            },
+            checkTel (rule,value,callback) {
+                if (value){
+                    const regex = /^0\\d{2,3}-?\\d{7,8}$|\d{11}$/;//验证是否为联系方式
+                    if (!regex.test(value)) {
+                        callback('联系电话输入有误!');
+                    }
+                }
+                callback();
+            },
         },
     }
 </script>

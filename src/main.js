@@ -38,6 +38,7 @@ import { Switch } from 'ant-design-vue';
 import { Slider } from 'ant-design-vue';
 import { Radio } from 'ant-design-vue';
 import { Rate } from 'ant-design-vue';
+import { Cascader } from 'ant-design-vue';
 
 
 import App from './App'
@@ -75,6 +76,7 @@ Vue.use(Switch);
 Vue.use(Slider);
 Vue.use(Radio);
 Vue.use(Rate);
+Vue.use(Cascader);
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

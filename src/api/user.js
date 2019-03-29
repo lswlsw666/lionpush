@@ -2,6 +2,7 @@
  * lsw 2019 01 09
  */
 import http from '../assets/js/http';
+import {async} from "q";
 
 /**
  * 用户登录
@@ -59,6 +60,18 @@ export function checkLoginName(userName) {
     return http.post('/member/User/checkloginuser',
         {
             userName,
+        });
+}
+
+/**
+ * 退出
+ * @param user_token
+ * @returns {Promise<*>}
+ */
+export async function loginout(user_token) {
+    return http.post('/member/User/loginout',
+        {
+            user_token
         });
 }
 

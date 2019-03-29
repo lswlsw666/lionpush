@@ -276,6 +276,7 @@
     }
 </style>
 <script>
+    import { loginout } from "@/api/user";
     function getBase64 (img, callback) {
         const reader = new FileReader();
         reader.addEventListener('load', () => callback(reader.result))
@@ -315,8 +316,18 @@
         },
         methods:{
             quit(){
-                this.flag = localStorage.setItem('token','');
-                this.$router.push('/Login');
+                const app = this;
+                const user_token = localStorage.getItem('token');
+                loginout(user_token).then(res=>{
+                    if (res.status == 200) {
+                        if (res.data.code == 40000) {
+                            app.flag = localStorage.setItem('token','');
+                            app.$router.push('/Login');
+                        }else {
+                            app.$Message.error(res.data.msg);
+                        }
+                    }
+                });
             },
             showDrawer() {
                 this.visible = true
