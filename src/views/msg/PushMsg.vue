@@ -181,19 +181,6 @@
                             </a-upload-dragger>
                         </div>
                     </a-form-item>
-
-                    <a-form-item
-                            v-bind="formItemLayout"
-                            label='地区'
-                            hasFeedback
-                    >
-                        <a-cascader v-decorator="[
-                                    'service',
-                                    {rules: [{ required: true, message: '请选择地区!' }]}]"
-                                    placeholder='请选择地区'
-                                    :options="options" @change="onSelect" changeOnSelect />
-                    </a-form-item>
-
                     <a-form-item
                             v-bind="formItemLayout"
                             label='微信号'
@@ -290,30 +277,6 @@
               objectStyle: {
                   display:'none'
               },
-              options: JSON.parse(localStorage.getItem('citydatas'))|| [],
-              // options: [{
-              //     value: 'zhejiang',
-              //     label: 'Zhejiang',
-              //     children: [{
-              //         value: 'hangzhou',
-              //         label: 'Hangzhou',
-              //         children: [{
-              //             value: 'xihu',
-              //             label: 'West Lake',
-              //         }],
-              //     }],
-              // }, {
-              //     value: 'jiangsu',
-              //     label: 'Jiangsu',
-              //     children: [{
-              //         value: 'nanjing',
-              //         label: 'Nanjing',
-              //         children: [{
-              //             value: 'zhonghuamen',
-              //             label: 'Zhong Hua Men',
-              //         }],
-              //     }],
-              // }]
           }
         },
         methods: {
@@ -444,7 +407,6 @@
                         areaList.push(this.citydatas[i].name);
                     }
                     this.areaOptions = areaList;
-                    console.log(this.citydatas);
                     localStorage.setItem('citydatas',JSON.stringify(this.citydatas));
                     localStorage.setItem('areaList',areaList);
                 }

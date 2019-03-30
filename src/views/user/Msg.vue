@@ -8,19 +8,33 @@
         <div slot="footer"><b>ant design vue</b> footer part</div>
         <a-list-item slot="renderItem" slot-scope="item, index" key="item.title">
             <template slot="actions" v-for="{type, text} in actions">
-        <span :key="type">
-          <a-icon :type="type" style="margin-right: 8px" />
-          {{text}}
-        </span>
+                <span :key="type">
+                  <a-icon :type="type" style="margin-right: 8px" />
+                  {{text}}
+                </span>
             </template>
             <img slot="extra" width="272" alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />
             <a-list-item-meta
-                    :description="item.description"
+                    :description="item.m_area+'|'+item.m_kind"
             >
                 <a slot="title" :href="item.href"><b>{{item.m_title}}</b></a>
                 <a-avatar slot="avatar" :src="avatar" />
             </a-list-item-meta>
-            {{item.m_tel}}/{{item.m_invest_money}}/{{item.m_company}}
+            <div style="padding-left: 45px">
+                <b style="color: red">{{item.m_tel}}</b>/{{item.m_invest_money}}/{{item.m_company}}
+            </div>
+            <div style="display: -webkit-box;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        word-wrap: break-word;
+                        white-space: normal !important;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        text-indent: 26px;
+                        padding-top: 6px;
+                        ">
+                {{item.m_description}}
+            </div>
         </a-list-item>
     </a-list>
 </template>
@@ -63,5 +77,7 @@
     }
 </script>
 <style>
-
+    .ant-list-vertical .ant-list-item-meta {
+        margin-bottom: 6px;
+    }
 </style>
