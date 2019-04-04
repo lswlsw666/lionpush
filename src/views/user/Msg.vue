@@ -13,16 +13,22 @@
                   {{text}}
                 </span>
             </template>
-            <img slot="extra" width="272" alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />
+            <!--<img slot="extra" width="272" alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />-->
+            <img slot="extra" width="272" height="178" alt="logo" :src="item.m_pics" />
             <a-list-item-meta
                     :description="item.m_area+'|'+item.m_kind"
             >
                 <a slot="title" :href="item.href"><b>{{item.m_title}}</b></a>
                 <a-avatar slot="avatar" :src="avatar" />
             </a-list-item-meta>
-            <div style="padding-left: 45px">
-                <b style="color: red">{{item.m_tel}}</b>/{{item.m_invest_money}}/{{item.m_company}}
-            </div>
+            <a-row :gutter="16">
+                <a-col :span="12" style="padding-left: 55px;">
+                    <b style="color: red">{{item.m_tel}}</b>/{{item.m_invest_money}}/{{item.m_company}}
+                </a-col>
+                <a-col :span="12" style="text-align: right;">
+                    {{item.add_time}}
+                </a-col>
+            </a-row>
             <div style="display: -webkit-box;
                         overflow: hidden;
                         text-overflow: ellipsis;

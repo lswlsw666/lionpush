@@ -22,28 +22,48 @@
                 <a-row :gutter="16">
                     <a-col :span="12">
                         <a-card>
-                            <p>1000</p>
-                            <span>消息总数</span>
+                            <a-col :span="12" style="text-align: center">
+                                <a-icon type="message" style="font-size: 40px;color: #1890ff" />
+                            </a-col>
+                            <a-col :span="12">
+                                <p>1000</p>
+                                <span>消息总数</span>
+                            </a-col>
                         </a-card>
                     </a-col>
                     <a-col :span="12">
                         <a-card>
-                            <p>10000</p>
-                           <span>总浏览</span>
+                            <a-col :span="12" style="text-align: center">
+                                <a-icon type="eye" style="font-size: 40px;color: #52c41a" />
+                            </a-col>
+                            <a-col :span="12">
+                                <p>1000</p>
+                                <span>总浏览</span>
+                            </a-col>
                         </a-card>
                     </a-col>
                 </a-row>
                 <a-row :gutter="16">
                     <a-col :span="12">
                         <a-card>
-                            <p>750</p>
-                            <span>被收录</span>
+                            <a-col :span="12" style="text-align: center">
+                                <a-icon type="smile" style="font-size: 40px;color: hotpink" />
+                            </a-col>
+                            <a-col :span="12">
+                                <p>1000</p>
+                                <span>被收录</span>
+                            </a-col>
                         </a-card>
                     </a-col>
                     <a-col :span="12">
                         <a-card>
-                            <p>250</p>
-                            <span>未收录</span>
+                            <a-col :span="12" style="text-align: center">
+                                <a-icon type="frown" style="font-size: 40px;" />
+                            </a-col>
+                            <a-col :span="12">
+                                <p>1000</p>
+                                <span>未收录</span>
+                            </a-col>
                         </a-card>
                     </a-col>
                 </a-row>
@@ -62,8 +82,10 @@
     import ARow from "ant-design-vue/es/grid/Row";
     import Msg  from '@/views/user/Msg.vue';
     import { allNews } from "@/api/msg";
+    import ACol from "ant-design-vue/es/grid/Col";
     export default {
         components: {
+            ACol,
             ARow,Msg
         },
         mounted () {
