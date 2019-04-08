@@ -7,8 +7,8 @@
     >
         <div slot="footer"><b>ant design vue</b> footer part</div>
         <a-list-item slot="renderItem" slot-scope="item, index" key="item.title">
-            <template slot="actions" v-for="{type, text} in actions">
-                <span :key="type">
+            <template slot="actions" v-for="{type, text,title,method} in actions">
+                <span :key="type" :title="title" @click="msgClick(method,item.id)">
                   <a-icon :type="type" style="margin-right: 8px" />
                   {{text}}
                 </span>
@@ -23,10 +23,12 @@
             </a-list-item-meta>
             <a-row :gutter="16">
                 <a-col :span="12" style="padding-left: 55px;">
-                    <b style="color: red">{{item.m_tel}}</b>/{{item.m_invest_money}}/{{item.m_company}}
+                    <a-tag color="#f50">{{item.m_tel}}</a-tag><a-tag color="#2db7f5">{{item.m_invest_money}}</a-tag><a-tag color="#108ee9">{{item.m_company}}</a-tag>
                 </a-col>
-                <a-col :span="12" style="text-align: right;">
+                <a-col :span="12" style="text-align: right;margin-top: -60px">
                     {{item.add_time}}
+                    <br /><br />
+                    <a-tag color="#00cc66">正常显示</a-tag>
                 </a-col>
             </a-row>
             <div style="display: -webkit-box;
@@ -45,6 +47,8 @@
     </a-list>
 </template>
 <script>
+    import { editNews } from "@/api/msg";
+
     const listData = [];
     for (let i = 0; i < 23; i++) {
         listData.push({
@@ -73,13 +77,38 @@
                     }
                 },
                 actions: [
-                    { type: 'star-o', text: '156' },
-                    { type: 'like-o', text: '156' },
-                    { type: 'message', text: '2' },
+                    { type: 'edit',title:'编辑',method:'edit_msg'},
+                    { type: 'delete',title:'删除',method:'delete_msg'},
+                    { type: 'eye', text: '11211' ,title:'浏览次数'},
+                    { type: 'star-o', text: '156',title:'收藏次数'},
+                    { type: 'like-o', text: '156',title:'点赞次数' },
+                    { type: 'message', text: '2',title:'评论次数' },
                 ],
                 avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
             }
         },
+        methods:{
+            msgClick(m,id) {
+                var user_token = localStorage.getItem('token');
+                const app = this;
+                switch (m) {
+                    case 'edit_msg':
+                        editNews(id,user_token).then(res=>{
+                            if (res.status == 200) {
+                                if (res.data.code == 40000) {
+                                    app.$router.push('/PushMsg');
+                                }else {
+                                    app.$Message.error(res.data.msg);
+                                }
+                            }
+                        });
+                        break;
+                        // alert('编辑信息么？老铁');break;
+                    case 'delete_msg':alert('删除信息么？老铁');break;
+                    default:alert('想干嘛？老铁');break;
+                }
+            }
+        }
     }
 </script>
 <style>
