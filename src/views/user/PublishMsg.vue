@@ -107,9 +107,8 @@
         },
         methods:{
             getNewsData (callback){
-                const token = localStorage.getItem('token');
                 const app = this;
-                allNews(token).then(res=>{
+                allNews().then(res=>{
                     if (res.status == 200){
                         if (res.data.code == 40000){
                             callback(res.data);

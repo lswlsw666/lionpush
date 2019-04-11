@@ -12,12 +12,12 @@ export function getNews() {
  * @param user_token
  * @returns {*}
  */
-export function allNews(user_token) {
-    return http.post('member/Msg/index',{user_token});
+export function allNews() {
+    return http.post('member/Msg/index');
 }
 
 /**
- * 发布信息
+ * 发布消息
  * @param title
  * @param service
  * @param kind
@@ -30,9 +30,12 @@ export function allNews(user_token) {
  * @param weixin
  * @param contactuser
  * @param tel
+ * @param city_id
+ * @param service_id
+ * @param province_id
  * @returns {Promise<*>}
  */
-export async function pushNews({title,service,kind,area,invest_money,brand_name,company,description,pics,weixin,contactuser,tel}) {
+export async function pushNews({title,service,kind,area,invest_money,brand_name,company,description,pics,weixin,contactuser,tel,city_id,service_id,province_id}) {
     return http.post('member/Msg/pushNews',{
         title,//标题
         service,//服务内容
@@ -46,6 +49,9 @@ export async function pushNews({title,service,kind,area,invest_money,brand_name,
         weixin,//微信
         contactuser,//联系人
         tel,//电话
+        city_id,//城市id
+        service_id,//服务id
+        province_id,//服务id
     });
 }
 
@@ -55,6 +61,6 @@ export async function pushNews({title,service,kind,area,invest_money,brand_name,
  * @param user_token
  * @returns {Promise<*>}
  */
-export async function editNews(id,user_token) {
-    return http.post('member/Msg/editNews',{id, user_token});
+export async function editNews(id) {
+    return http.post('member/Msg/editNews',{id});
 }

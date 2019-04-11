@@ -13,6 +13,9 @@
     <div class="lay-total" v-else>
       <router-view></router-view>
     </div>
+    <div>
+      <a-back-top />
+    </div>
     <!--<Header v-show="headershow" :class="{'hidden': !headershow}"></Header>-->
     <!--<Content v-show="contentshow" :class="{'hidden': !contentshow}"></Content>-->
     <!--<Footer v-show="footershow" :class="{'hidden': !footershow}"></Footer>-->
@@ -41,7 +44,7 @@ export default {
                   this.flag = '';
               } else{
                   this.msg_flag = false;
-                  if (name === 'PushMsg') {
+                  if (name === 'PushMsg' || name === 'MsgInfo') {
                       this.msg_flag = true;
                   }
                   this.flag = true;

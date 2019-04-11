@@ -11,6 +11,9 @@ const http = Axios.create({
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 });
+
+//设置请求头部携带信息token
+// http.defaults.headers.common["Authorization"] = localStorage.getItem('token');
 // Vue.use(VueAxios,http);
 
 //请求拦截器

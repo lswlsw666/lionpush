@@ -89,13 +89,14 @@
         },
         methods:{
             msgClick(m,id) {
-                var user_token = localStorage.getItem('token');
                 const app = this;
                 switch (m) {
                     case 'edit_msg':
-                        editNews(id,user_token).then(res=>{
+                        editNews(id).then(res=>{
                             if (res.status == 200) {
                                 if (res.data.code == 40000) {
+                                    localStorage.setItem('editdatas',JSON.stringify(res.data.data));//将修改信息存入缓存
+                                    app.app_editdatas = JSON.stringify(res.data.data);
                                     app.$router.push('/PushMsg');
                                 }else {
                                     app.$Message.error(res.data.msg);

@@ -150,6 +150,7 @@
                                   rules: [{ required: true, message: '请输入产品描述!' }]
                                 }]"
                                 :rows="4"
+                                :autosize="true"
                                 placeholder="请输入产品描述..."
                         />
                     </a-form-item>
@@ -170,6 +171,7 @@
                                     listType="picture"
                                     :multiple="true"
                                     :beforeUpload="beforeUpload"
+                                    :headers="authorization"
                                     @change="handleUpload"
                                     class="upload-list-inline"
                             >
@@ -239,18 +241,62 @@
     import { getAreas,getService } from '@/api/area';
     import { pushNews } from "@/api/msg";
     const plainOptions = [];
+    const token =`Bearer ${localStorage.getItem('token')}`;
     export default {
         beforeCreate () {
             window.test = this;
             this.form = this.$form.createForm(this);
         },
         mounted () {
+            const editdatas = JSON.parse(localStorage.getItem('editdatas'));
             this.getData((res) => {
                 this.data = res.result;
+                var minid = this.data.areainfo[editdatas.m_province_id-1].city[0].id;
+                this.selectedcity = this.data.areainfo[editdatas.m_province_id-1].city[editdatas.m_city_id-minid].name;
+                this.citydatas = this.data.areainfo[editdatas.m_province_id-1].city[editdatas.m_province_id-minid].district;
+                if (this.citydatas.length > 0){
+                    var areaList = [];
+                    for (var i = 0; i < this.citydatas.length;i++){
+                        areaList.push(this.citydatas[i].name);
+                    }
+                    this.areaOptions = areaList;
+                }
+                this.areaCheckedList = editdatas.m_area.split(',');
+                this.indeterarea = !!this.areaCheckedList.length && (this.areaCheckedList.length < this.areaOptions.length);
+                this.checkAreasAll = this.areaCheckedList.length === this.areaOptions.length;
+
             });
             this.getServiceData((res) =>{
                 this.servicedata = res.results;
+                this.plainOptions = this.servicedata.serviceinfo[editdatas.m_service_id-1].info;
+                this.checkedList = editdatas.m_kind.split(',');
+                this.indeterminate = !! this.checkedList.length && (this.checkedList.length < this.plainOptions.length);
+                this.checkAll = this.checkedList.length === this.plainOptions.length;
+                this.service_id = editdatas.m_service_id;
+                if (this.plainOptions.length > 0){
+                    this.servicevisible = true;
+                }else{
+                    this.servicevisible = false;
+                }
+            });
+            // this.fileList = editdatas.m_pics;
+            //编辑信息内容
+            this.$nextTick(() => {
+                this.form.setFieldsValue({
+                    title: editdatas.m_title,
+                    service: editdatas.m_service,
+                    invest_money: editdatas.m_invest_money,
+                    brand_name: editdatas.m_brand_name,
+                    company: editdatas.m_company,
+                    description: editdatas.m_description,
+                    pics: editdatas.m_pics,
+                    // fileList: editdatas.m_pics,
+                    weixin: editdatas.m_weixin,
+                    contactuser: editdatas.m_contactuser,
+                    tel: editdatas.m_tel,
+                });
             })
+
         },
         data (){
           return {
@@ -277,6 +323,11 @@
               objectStyle: {
                   display:'none'
               },
+              editdatas:[],
+              authorization:{'Authorization':token} || [],
+              service_id:localStorage.getItem('service_id')?localStorage.getItem('service_id'):1,
+              city_id: localStorage.getItem('city_id')?localStorage.getItem('city_id'):1,
+              province_id: localStorage.getItem('province_id')?localStorage.getItem('province_id'):0,
           }
         },
         methods: {
@@ -298,6 +349,9 @@
                 this.form.validateFields((err, values) => {
                     values.kind = app.checkedList.join(',');
                     values.area = app.areaCheckedList.join(',');
+                    values.service_id = app.service_id;
+                    values.city_id = app.city_id;
+                    values.province_id = app.province_id;
                     if (values.pics) {
                         var pics = values.pics;
                         var picList = [];
@@ -316,20 +370,13 @@
                     if (!values.invest_money) {
                         app.$Message.error('请选择投资金额!');
                     }
-                    if (localStorage.getItem('token')){
-                        values.u_token = localStorage.getItem('token');
-                    } else {
-                        app.$Message.error('登录状态已失效，请重新登录!');
-                        localStorage.setItem('token','');
-                        this.$router.push('/Login');
-                    }
                     if (!err && values.area.length > 0 && values.invest_money) {
                         pushNews(values).then(res=>{
                             if (res.status == 200) {
                                 if (res.data.code == 40000) {
                                     app.$Message.success(res.data.msg);
                                     app.objectStyle.display = 'none';
-                                    app.$router.push('/');
+                                    app.$router.push('/Pub');
                                 }else {
                                     app.$Message.error(res.data.msg);
                                     app.objectStyle.display = 'none';
@@ -369,9 +416,6 @@
                 this.indeterminate = !!checkedList.length && (checkedList.length < this.plainOptions.length);
                 this.checkAll = checkedList.length === this.plainOptions.length;
             },
-            onSelect (value) {
-                console.log(value);
-            },
             onCheckAllChange (e) {
                 Object.assign(this, {
                     checkedList: e.target.checked ? this.plainOptions : [],
@@ -410,9 +454,15 @@
                     localStorage.setItem('citydatas',JSON.stringify(this.citydatas));
                     localStorage.setItem('areaList',areaList);
                 }
+                this.city_id = f;
+                this.province_id = e;
+                this.indeterarea = false;
                 localStorage.setItem('city',this.selectedcity);
+                localStorage.setItem('city_id',f);
+                localStorage.setItem('province_id',e);
             },
             selectService(e) {
+                this.service_id = e;
                 this.plainOptions = this.servicedata.serviceinfo[e-1].info;
                 this.indeterminate = false;
                 this.checkAll = false;
@@ -422,6 +472,7 @@
                 }else{
                     this.servicevisible = false;
                 }
+                localStorage.setItem('service_id',e);
             },
             checkTitle (rule,value,callback) {
                 if (value){
