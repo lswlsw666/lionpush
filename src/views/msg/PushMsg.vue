@@ -141,19 +141,19 @@
                                 maxlength="26"
                         />
                     </a-form-item>
-                    <a-form-item
-                            v-bind="formItemLayout"
-                            label="描述"
-                    >
-                        <a-textarea
-                                v-decorator="['description', {
-                                  rules: [{ required: true, message: '请输入产品描述!' }]
-                                }]"
-                                :rows="4"
-                                :autosize="true"
-                                placeholder="请输入产品描述..."
-                        />
-                    </a-form-item>
+                    <!--<a-form-item-->
+                            <!--v-bind="formItemLayout"-->
+                            <!--label="描述"-->
+                    <!--&gt;-->
+                        <!--<a-textarea-->
+                                <!--v-decorator="['description', {-->
+                                  <!--rules: [{ required: true, message: '请输入产品描述!' }]-->
+                                <!--}]"-->
+                                <!--:rows="4"-->
+                                <!--:autosize="true"-->
+                                <!--placeholder="请输入产品描述..."-->
+                        <!--/>-->
+                    <!--</a-form-item>-->
                     <a-form-item
                             v-bind="formItemLayout"
                             label='图片'
@@ -226,6 +226,16 @@
                         />
                     </a-form-item>
                     <a-form-item
+                            v-bind="formItemLayout"
+                            label='描述'
+                            :required="true"
+                    >
+                        <quill-editor :options="editorOption"
+                              @change="des_change"
+                              v-model="description"
+                        ></quill-editor>
+                    </a-form-item>
+                    <a-form-item
                             :wrapperCol="{ span: 12, offset: 6 }"
                     >
                         <a-button type='primary' htmlType='submit'>立即发布</a-button>
@@ -240,9 +250,14 @@
 <script>
     import { getAreas,getService } from '@/api/area';
     import { pushNews } from "@/api/msg";
+    import AFormItem from "ant-design-vue/es/form/FormItem";
+    import 'quill/dist/quill.core.css'
+    import 'quill/dist/quill.snow.css'
+    import 'quill/dist/quill.bubble.css'
     const plainOptions = [];
     const token =`Bearer ${localStorage.getItem('token')}`;
     export default {
+        components: {AFormItem},
         beforeCreate () {
             window.test = this;
             this.form = this.$form.createForm(this);
@@ -279,6 +294,7 @@
                     this.servicevisible = false;
                 }
             });
+            // this.description = editdatas.m_description;
             // this.fileList = editdatas.m_pics;
             //编辑信息内容
             this.$nextTick(() => {
@@ -288,7 +304,7 @@
                     invest_money: editdatas.m_invest_money,
                     brand_name: editdatas.m_brand_name,
                     company: editdatas.m_company,
-                    description: editdatas.m_description,
+                    // description: editdatas.m_description,
                     pics: editdatas.m_pics,
                     // fileList: editdatas.m_pics,
                     weixin: editdatas.m_weixin,
@@ -328,6 +344,22 @@
               service_id:localStorage.getItem('service_id')?localStorage.getItem('service_id'):1,
               city_id: localStorage.getItem('city_id')?localStorage.getItem('city_id'):1,
               province_id: localStorage.getItem('province_id')?localStorage.getItem('province_id'):0,
+              editorOption: {
+                  modules: {
+                      toolbar: [
+                          ['bold', 'italic', 'underline'],
+                          [{ 'header': 1 }, { 'header': 2 }],
+                          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                          [{ 'size': ['small', false, 'large', 'huge'] }],
+                          [{ 'color': [] }],
+                          [{ 'align': [] }],
+                          ['clean'],
+                          // ['image']
+                      ]
+                  },
+                  placeholder: '请输入产品描述...'
+              },
+              description:'',
           }
         },
         methods: {
@@ -363,6 +395,9 @@
                         if (picList.length > 0){
                             values.pics = picList.join(',');
                         }
+                    }
+                    if (app.description.length > 0){
+                        values.description = app.description;
                     }
                     if (values.area.length <= 0) {
                         app.$Message.error('请选择服务范围!');
@@ -492,6 +527,9 @@
                 }
                 callback();
             },
+            des_change() {
+                console.log(this.description);
+            }
         },
     }
 </script>
@@ -529,5 +567,22 @@
     .upload-list-inline >>> .ant-upload-animate-leave {
         animation-name: uploadAnimateInlineOut;
     }
+/**
+富文本编辑器
+ */
+    .quill-editor {
+        height: 100%;
+        min-height: 300px;
+    }
+    .ql-container {
+        height: 100%;
+        min-height: 300px;
+    }
+    .ql-snow .ql-editor img {
+        max-width: 480px;
+    }
 
+    .ql-editor .ql-video {
+        max-width: 480px;
+    }
 </style>

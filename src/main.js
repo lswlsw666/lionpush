@@ -4,6 +4,7 @@ import Vue from 'vue'
 // import Vue from 'vue/dist/vue.min.js';
 import VueRouter from 'vue-router';
 import ViserVue from 'viser-vue';
+import VueQuillEditor from 'vue-quill-editor';
 //导入路由
 import router from './router';
 import { Button } from 'ant-design-vue';
@@ -80,6 +81,7 @@ Vue.use(Rate);
 Vue.use(Cascader);
 Vue.use(BackTop);
 Vue.config.productionTip = false;
+Vue.use(VueQuillEditor);
 
 /* eslint-disable no-new */
 new Vue({
